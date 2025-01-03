@@ -1,0 +1,42 @@
+services:
+  travel-mysql-db:
+    image: mariadb:10.6
+    container_name: travel-mysql-db
+    restart: always
+    volumes:
+      - mysql_travel-data:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: db-travel
+      MYSQL_USER: travelDb
+      MYSQL_PASSWORD: travelApp1234
+      MYSQL_ROOT_PASSWORD: adminAppTravel
+    ports:
+      - 3306:3306
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      timeout: 5s
+      retries: 10
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    ports:
+      - 9999:80
+    environment:
+      PMA_HOST: travel-mysql-db
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+  Travel_ai_devops:
+    build: .
+    container_name: travel_devops_ai
+    image: travel_devops_ai
+    ports:
+      - '8099:8099'
+    expose:
+      - '8099'
+    restart: always
+    depends_on:
+      - travel-mysql-db
+    environment:
+      - DB_URL=jdbc:mysql://travel-mysql-db:3306/db-travel
+volumes:
+  mysql_travel-data:
