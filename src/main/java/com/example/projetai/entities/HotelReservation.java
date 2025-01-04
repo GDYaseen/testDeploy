@@ -1,6 +1,8 @@
 package com.example.projetai.entities;
 
 import com.example.projetai.enums.ReservationStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -15,6 +17,7 @@ public class HotelReservation {
     private Long id;
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
     private String hotelId;
     private String hotelName;
@@ -24,4 +27,5 @@ public class HotelReservation {
     @Enumerated(EnumType.STRING)
     private ReservationStatus status;
     private String paymentIntentId;
+    private String currency;
 }

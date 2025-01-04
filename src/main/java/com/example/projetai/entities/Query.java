@@ -19,7 +19,7 @@ public class Query {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Lob
-    @Column(nullable = false)
+    @Column(nullable = false,length = 600)
     private String queryText;
     private LocalDateTime createdAt;
     @ManyToOne

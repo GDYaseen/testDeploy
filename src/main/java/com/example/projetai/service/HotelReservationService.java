@@ -1,6 +1,6 @@
 package com.example.projetai.service;
 
-import com.example.projetai.dto.ReservationRequest;
+import com.example.projetai.dto.HotelReservationRequest;
 import com.example.projetai.entities.HotelReservation;
 import com.example.projetai.entities.User;
 import com.example.projetai.enums.ReservationStatus;
@@ -22,7 +22,7 @@ public class HotelReservationService {
     @Autowired
     private UserRepository userRepository;
 
-    public HotelReservation createReservation(ReservationRequest request) throws StripeException {
+    public HotelReservation createReservation(HotelReservationRequest request) throws StripeException {
 
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("Utilisateur introuvable"));
@@ -36,13 +36,14 @@ public class HotelReservationService {
         reservation.setCheckOutDate(request.getCheckOutDate());
         reservation.setTotalPrice(request.getTotalPrice());
         reservation.setStatus(ReservationStatus.PENDING);
+        reservation.setCurrency(request.getCurrency());
         reservation = reservationRepository.save(reservation);
 
         PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
                 .setAmount((long) (request.getTotalPrice() * 100))
-                .setCurrency("usd")
-                .setCustomer("cus_RVchCvmWezzA59")
-                .putMetadata("reservationId", reservation.getId().toString())
+                .setCurrency(request.getCurrency().toLowerCase())
+                .setCustomer(user.getCustomerStripeId())
+                .putMetadata("hotelReservationId", reservation.getId().toString())
                 .build();
         PaymentIntent paymentIntent = PaymentIntent.create(params);
 
